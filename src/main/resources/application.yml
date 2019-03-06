@@ -1,0 +1,44 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: hello
+  jpashow-sql: true
+  jpadatabase: mysql
+#  datasource:
+#    url: jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+#    username: root
+#    password: redhat
+#    driver-class-name: com.mysql.jdbc.Driver
+  jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      ddl-auto: none
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+    database-platform: org.hibernate.dialect.MySQLDialect
+logging:
+  level:
+    root: info
+
+sharding:
+  jdbc:
+    datasource:
+      names: test0
+      test0:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3306/test0?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+        username: root
+        password: redhat
+    config:
+      sharding:
+        tables:
+          T_USER:
+            actual-data-nodes: test0.t_user_$->{0..9}
+            table-strategy:
+              inline:
+                sharding-column: id
+                algorithm-expression: test0.t_user_$->{id % 10}
